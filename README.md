@@ -2,111 +2,171 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/dudulrx/roarm_ws)
 ![GitHub repo size](https://img.shields.io/github/repo-size/dudulrx/roarm_ws) ![GitHub](https://img.shields.io/github/license/dudulrx/roarm_ws) ![GitHub last commit](https://img.shields.io/github/last-commit/dudulrx/roarm_ws)
 
+> This project is based on code from [Original Repo](https://github.com/waveshareteam/roarm_ws)  
+> by **DUDULRX**.
 
-# ROS2 + Moveit2 for RoArm
+---
 
-## 1 Installing ROS2 Applications for RoArm on Ubuntu 22.04 (ROS2 Humble)
-- Download the Ubuntu 22.04 image
-    - Link: [Ubuntu 22.04.4 Desktop Image](https://releases.ubuntu.com/jammy/ubuntu-22.04.4-desktop-amd64.iso)
-- Download and install Oracle VM VirtualBox
-    - Link: [VirtualBox Downloads](https://www.virtualbox.org/wiki/Downloads)
+# RoArm ROS2 Workspace
 
-### 1.1 Loading the Image File
-- Run Oracle VM VirtualBox.
-- Click on New → Enter a name → Choose a project folder (preferably on a disk with sufficient space) → Specify the virtual optical disk as the image file you just downloaded.
-    - Note: Ensure to uncheck Skip Unattended Installation. Otherwise, in Oracle VM VirtualBox versions above 7.0, you might not have root permissions and might not be able to use the terminal.
-- After proceeding, select the newly appeared image name on the left, click on Settings → Display → Screen, and increase the video memory if possible. If conditions allow, allocate 128 MB. Apply the settings.
-- Double-click the image on the left, then select Try or Install Ubuntu.
-- Install Ubuntu 22.04.
+ROS2 workspace for controlling and experimenting with the **RoArm robotic arm** using **MoveIt2**, **RViz2**, and ROS2 driver nodes.
 
-### 1.2 Downloading the Project and Installing Dependencies
-Update software sources:
+The workspace includes simulation, motion planning, keyboard control, and service-based command control for both **RoArm M2** and **RoArm M3** models.
 
-    sudo apt update
+---
 
-Upgrade the system:
+# Features
 
-    sudo apt upgrade
+- ROS2 integration for RoArm
+- MoveIt2 motion planning
+- RViz2 visualization
+- Keyboard teleoperation
+- Command-based control via ROS services
+- Support for **RoArm M2** and **RoArm M3**
+- MoveIt Task Constructor demos
 
-Install git:
+---
 
-    sudo apt install git
+# Requirements
 
-Then, clone the project from GitHub:
+- Ubuntu 22.04
+- ROS 2 Humble
+- Python 3
+- Git
+- ROS 2 development tools
 
-    git clone https://github.com/DUDULRX/roarm_ws.git
+> If ROS 2 Humble is not installed, follow the [official installation instructions](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html) for Ubuntu.
 
-Install dependencies:
+**Source ROS 2 in your terminal**  
+After installation, make sure your shell always knows about ROS 2 by adding it to your bashrc. This ensures every new terminal session automatically has access to ROS 2:
 
-    sudo apt install software-properties-common
-    sudo add-apt-repository universe
-    
-    sudo apt update && sudo apt install curl -y
-    sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-    
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-    
-    sudo apt update
-    sudo apt upgrade
-    
-    sudo apt install ros-humble-desktop
-    sudo apt install ros-dev-tools
-    sudo apt install net-tools
-    sudo apt install ros-humble-moveit-*
-    sudo apt remove ros-humble-moveit-servo-*
-    sudo apt install ros-humble-generate-parameter-library
-    sudo apt install ros-humble-py-binding-tools
+```bash
+echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
 
-Add ROS2 to the source
-Source the setup script:
+---
 
-    echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-    source ~/.bashrc
+# Installation
 
-Install Python3 libraries :
+## 1 Clone the Workspace
 
-##### pip install
+Install Git if needed:
 
+```bash
+sudo apt update
+sudo apt install git
+```
+Clone the workspace:
+```bash
+git clone https://github.com/N1koleas/roarm_ws
+cd roarm_ws
+```
+## 1.2 Install Python Dependencies
+
+Install pip if needed:
+```bash
+sudo apt install python3-pip
+```
+Install required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
+## 1.3 Install required ROS packages:
+```bash
+sudo apt-get update && sudo apt-get install -y \
+ros-humble-moveit \
+ros-humble-generate-parameter-library \
+ros-humble-py-binding-tools \
+ros-humble-control-msgs \
+ros-humble-realtime-tools \
+ros-humble-xacro \
+ros-humble-joint-state-publisher-gui 
+```
+These packages provide MoveIt planning, visualization, and control interfaces required by the robot.
 
-Initial compilation:
+## 1.4 Select Robot Model
 
-    cd /home/ws/roarm_ws
-    sudo chmod +x build_first.sh
-    . build_first.sh
+Set the robotic arm model.
 
-Contents of build_first.sh (automatically run by the script; no manual execution required). This step may take a while to complete.
+### For ROARM M2
+```bash
+echo "export ROARM_MODEL=roarm_m2" >> ~/.bashrc
+source ~/.bashrc
+```
+### For ROARM M3
+```bash
+echo "export ROARM_MODEL=roarm_m3" >> ~/.bashrc
+source ~/.bashrc
+```
+## 1.5 Build the Workspace
 
-    cd /home/ws/roarm_ws
-    colcon build --packages-select roarm_msgs 
-    colcon build --packages-select moveit_servo 
-    colcon build --packages-select rviz_marker_tools 
-    colcon build --packages-select moveit_task_constructor_msgs 
-    colcon build --packages-select moveit_task_constructor_core 
-    colcon build --packages-select moveit_task_constructor_capabilities 
-    colcon build --packages-select moveit_task_constructor_visualization 
-    colcon build --packages-select roarm_moveit_cmd 
-    colcon build --packages-select roarm_moveit_ikfast_plugins 
-    colcon build --packages-select roarm_moveit_mtc_demo 
-    colcon build --packages-select roarm_moveit_servo 
-    colcon build --packages-select roarm_description roarm_driver roarm_moveit --symlink-install 
-    echo "source /home/ws/roarm_ws/install/setup.bash" >> ~/.bashrc
-    source ~/.bashrc 
+Navigate to the workspace root:
+```bash
+cd ~/roarm_ws
+```
+Make the build script executable:
+```bash
+sudo chmod +x build_first.sh
+```
+Run the build script:
+```bash
+. build_first.sh
+```
+The script automatically builds all required packages.
+The first build may take several minutes depending on your system.
+Some packages may generate stderr output during the compilation process, which can be ignored.
 
-Then, set the robotic arm model，
+### Build Script
 
-for roarm_m2
+The build_first.sh script handles the full package build process automatically.
 
-    echo "export ROARM_MODEL=roarm_m2" >> ~/.bashrc 
-    source ~/.bashrc 
-for roarm_m3
+This script is executed in the previous step and does not need to be run manually again.
 
-    echo "export ROARM_MODEL=roarm_m3" >> ~/.bashrc 
-    source ~/.bashrc 
-    
-At this point, you can use the tutorial content. Some packages may generate stderr output during the compilation process, which can be ignored.
+Example content:
+
+```bash
+#!/bin/bash
+set -e  # exit on any error
+
+WORKSPACE_DIR=$(pwd)
+
+# source existing setup if available
+if [ -f "$WORKSPACE_DIR/install/setup.bash" ]; then
+    source "$WORKSPACE_DIR/install/setup.bash"
+fi
+
+# build base package first
+colcon build --packages-select roarm_msgs --symlink-install
+
+grep -qxF "source ~/roarm_ws/install/setup.bash" ~/.bashrc || echo "source ~/roarm_ws/install/setup.bash" >> ~/.bashrc
+source "$WORKSPACE_DIR/install/setup.bash"
+
+# build packages that depend on it
+colcon build --packages-select moveit_servo rviz_marker_tools --symlink-install
+colcon build --packages-select moveit_task_constructor_msgs moveit_task_constructor_core moveit_task_constructor_capabilities moveit_task_constructor_visualization --symlink-install
+source "$WORKSPACE_DIR/install/setup.bash"
+
+# build roarm MoveIt packages
+colcon build --packages-select roarm_moveit_cmd roarm_moveit_ikfast_plugins roarm_moveit_mtc_demo roarm_moveit_servo --symlink-install
+source "$WORKSPACE_DIR/install/setup.bash"
+
+# build remaining meta packages
+colcon build --packages-select roarm_description roarm_driver roarm_moveit --symlink-install
+
+# final source so your terminal is ready
+source "$WORKSPACE_DIR/install/setup.bash"
+
+echo "Workspace built successfully!"
+```
+## Optional: Clean Rebuild
+
+If you encounter build errors or dependency issues:
+```bash
+colcon build --symlink-install --cmake-clean-cache
+```
+
+---
 
 ## 2 Roarm_ws Package Overview
 roarm_ws is a workspace containing multiple ROS2 packages, each serving a specific purpose in the operation and control of robotic arms. Below is an overview of each package and its main functionalities:
