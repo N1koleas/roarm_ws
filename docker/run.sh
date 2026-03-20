@@ -13,7 +13,6 @@ echo "Starting RoArm container with model $MODEL..."
 xhost +si:localuser:$(whoami) >/dev/null 2>&1
 
 docker run -it --rm \
-  --user $(id -u):$(id -g) \
   -e DISPLAY=$DISPLAY \
   -e ROARM_MODEL=roarm_$MODEL \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
