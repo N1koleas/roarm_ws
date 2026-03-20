@@ -2,8 +2,7 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/dudulrx/roarm_ws)
 ![GitHub repo size](https://img.shields.io/github/repo-size/dudulrx/roarm_ws) ![GitHub](https://img.shields.io/github/license/dudulrx/roarm_ws) ![GitHub last commit](https://img.shields.io/github/last-commit/dudulrx/roarm_ws)
 
-> This project is based on code from [Original Repo](https://github.com/waveshareteam/roarm_ws)  
-> by **DUDULRX**.
+> This project is based on code from [DUDULRX](https://github.com/waveshareteam/roarm_ws)
 
 ---
 
@@ -168,7 +167,69 @@ colcon build --symlink-install --cmake-clean-cache
 
 ---
 
-## 2 Roarm_ws Package Overview
+## ROARM [Docker Image](https://hub.docker.com/r/nikoleas/roarm-humble) (ROS 2 Humble)
+
+This is a ready-to-use Docker image for the **ROARM robot software**.  
+It supports both **ROARM M2** and **ROARM M3** models and includes all necessary ROS 2 Humble packages, MoveIt, and build tools.
+
+### 1. Pull the image:
+
+```
+docker pull nikoleas/roarm-humble:latest
+```
+
+### 2. Clone the GitHub repository and move into the workspace:
+```
+git clone https://github.com/N1koleas/roarm_ws.git
+cd roarm_ws/
+```
+
+### 3. Allow the container to access your X server (for GUI apps like RViz and MoveIt):
+```
+xhost +local:root
+```
+>⚠️ This grants temporary permission for the container to open windows on your host. You can revoke it later with `xhost -local:root`.
+
+### 4. Make the run script executable
+This ensures that `docker/run.sh` has permission to run as a program:
+```
+chmod +x docker/run.sh
+```
+
+### 5. Run the container using the convenience script:
+For ROARM M2
+```
+./docker/run.sh m2
+```
+For ROARM M3
+```
+./docker/run.sh m3   # default model
+```
+The script automatically sets up GUI support (RViz, MoveIt) and the selected model.
+
+### 6. If you prefer to run manually:
+```
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -e ROARM_MODEL=roarm_m3 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  nikoleas/roarm-humble:latest
+```
+- Replace `roarm_m3` with `roarm_m2` for the other model.
+
+### Notes
+
+- You must remain inside the `roarm_ws/` folder for the entire Docker procedure.  
+  All commands below assume you are in this directory.  
+- The ROS workspace is located at `/opt/roarm_ws` inside the container.  
+- After starting the container, you can move into the workspace with:
+
+```
+cd /opt/roarm_ws
+```
+---
+
+## 3 Roarm_ws Package Overview
 roarm_ws is a workspace containing multiple ROS2 packages, each serving a specific purpose in the operation and control of robotic arms. Below is an overview of each package and its main functionalities:
 
 roarm_main:
@@ -225,8 +286,8 @@ roarm_else:
 
     Provides a framework for constructing complex robotic arm tasks using MoveIt Task Constructor (MTC).
 
-## 3 Controlling a Physical Robotic Arm with Driver Nodes
-### 3.1 Connect the Robotic Arm and Identify the Serial Port
+## 4 Controlling a Physical Robotic Arm with Driver Nodes
+### 4.1 Connect the Robotic Arm and Identify the Serial Port
 Before connecting the robotic arm via USB, check the current serial devices on your Ubuntu system:
     ls /dev/tty*
 
@@ -244,7 +305,7 @@ Check the serial devices again:
 
 You should now see a new device like `/dev/ttyUSB0` at the end of the list. If not, disconnect and reconnect the robotic arm.
 
-### 3.2 Running the Robotic Arm Driver Node
+### 4.2 Running the Robotic Arm Driver Node
 According to the ROS2 official documentation, it is not recommended to run ROS2 nodes in the same terminal where you compile the packages. Open a new terminal window using `Ctrl + Alt + T`.
 
 Grant serial port permissions and run the ROS2 robotic arm driver node:
@@ -257,7 +318,7 @@ Run the driver node:
 
     ros2 run roarm_driver roarm_driver serial_port:=/dev/ttyUSB0
 
-### 3.3 Viewing the Model Joints
+### 4.3 Viewing the Model Joints
 Open a new terminal window with `Ctrl + Alt + T`.
 
 Run Rviz2 to display the robotic arm model and the joint control panel:
@@ -281,7 +342,7 @@ You can control the LED on the gripper of the robot arm through the following co
 
     ros2 topic pub /led_ctrl std_msgs/msg/Float32 {"data: 0"} -1
 
-### 3.4 Manipulating the View in Rviz2
+### 4.4 Manipulating the View in Rviz2
 In Rviz2, you can adjust the view of the robot model using the mouse:
 
 Left-click and drag to move the view horizontally.
@@ -291,8 +352,8 @@ Press and hold the middle mouse button (wheel) and drag to move vertically.
 These operations allow you to view the robot model from any angle and distance.
 
 
-## 4 Interacting with the Robotic Arm End Effector Using MoveIt2
-### 4.1 Introduction to MoveIt2
+## 5 Interacting with the Robotic Arm End Effector Using MoveIt2
+### 5.1 Introduction to MoveIt2
 MoveIt2 is an open-source software for robotic motion planning, manipulation, and control. It provides a simple user interface to help developers handle complex motion planning problems.
 
 MoveIt2 supports various algorithms and strategies, including motion planning, execution, monitoring, kinematics, and collision detection. Its powerful features make it widely used in industrial, research, and educational fields.
@@ -301,7 +362,7 @@ MoveIt2 operates within the ROS2 (Robot Operating System 2) environment and inte
 
 In this tutorial, we will use MoveIt2 to control the robotic arm's movements. By dragging the end effector of the robotic arm, MoveIt2 can automatically calculate the motion path and control the actual movement of the robotic arm through the driver nodes.
 
-### 4.2 Running the MoveIt2 Demo
+### 5.2 Running the MoveIt2 Demo
 In the terminal window where Rviz2 is currently running, press `Ctrl + C` to close the Rviz2 session.
 
 Run the following command to execute the robotic arm MoveIt2 demo. This demo includes inverse kinematics solving, allowing you to interact with the robotic arm by dragging the end effector:
@@ -326,7 +387,7 @@ Next, click on `Add` in the bottom left corner, then select `MotionPlanning` and
 Now, you can change the posture of the robotic arm by dragging the sphere or XYZ axes at the end effector. This dragging will not immediately move the physical robotic arm. To execute the planned movements on the real robotic arm, you need to click the `Plan & Execute` button in the Planning tab on the right side of the screen.
 
 
-## 5 Controlling the Robotic Arm with Keyboard
+## 6 Controlling the Robotic Arm with Keyboard
 This chapter explains how to control the robotic arm using either keyboard keys or a gamepad. Note that the RoArm-M2-S does not come with a gamepad by default; you can purchase an Xbox Bluetooth gamepad and connect it to your computer for control.
 
 Before running this section, you need to close the previously running MoveIt2 demo, but keep the roarm_driver node running, as it is necessary for controlling the physical robotic arm.
@@ -335,7 +396,7 @@ Enter the following command to start the nodes related to controlling the roboti
 
     ros2 launch roarm_moveit_servo servo_control.launch.py
 
-### 5.1 Keyboard Control
+### 6.1 Keyboard Control
 Open a new terminal and run the following command. This terminal window should remain active as it will receive control commands from the keyboard:
 
     ros2 run roarm_moveit_servo keyboardcontrol
