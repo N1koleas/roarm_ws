@@ -13,7 +13,9 @@ echo "Starting RoArm container with model $MODEL..."
 xhost +si:localuser:$(whoami) >/dev/null 2>&1
 
 docker run -it --rm \
+  --device=/dev/ttyUSB0 \
+  --privileged \
   -e DISPLAY=$DISPLAY \
-  -e ROARM_MODEL=roarm_$MODEL \
+  -e ROARM_MODEL=roarm_m3 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   nikoleas/roarm-humble:latest
