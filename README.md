@@ -218,10 +218,13 @@ The script automatically sets up GUI support (RViz, MoveIt) and the selected mod
 ### 6. If you prefer to run manually:
 ```
 docker run -it --rm \
+  --device=/dev/ttyUSB0 \
+  --privileged \
   -e DISPLAY=$DISPLAY \
   -e ROARM_MODEL=roarm_m3 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   nikoleas/roarm-humble:latest
+
 ```
 - Replace `roarm_m3` with `roarm_m2` for the other model.
 
